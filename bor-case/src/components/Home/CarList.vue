@@ -4,6 +4,11 @@
       <div class="col-9"><h2>Car List</h2></div>
       <div class="col"><button @click="addCar" class="btn btn-primary">Add</button></div>
     </div>
+    <div class="row">
+      <div class="search-wrapper panel-heading col-sm-12">
+        <input class="form-control" type="text" v-model="searchQuery" placeholder="Plate Search" />
+      </div>
+    </div>
     <table class="table">
       <thead>
       <tr>
@@ -16,7 +21,7 @@
       </tr>
       </thead>
       <tbody>
-        <tr v-for="(car,index) in cars" :key="car.id">
+        <tr v-for="(car,index) in resultQuery" :key="car.id">
           <th scope="row">{{ index + 1 }}</th>
           <td>{{ car.brand }}</td>
           <td>{{ car.model }}</td>
@@ -40,12 +45,24 @@ const token = await localStorage.getItem('user_access_token');
 export default {
   data() {
     return {
+      searchQuery: null,
       cars: []
     };
   },
   created() {
 
     this.fetchCars()
+  },
+  computed: {
+    resultQuery(){
+      if(this.searchQuery){
+        return this.cars.filter((item)=>{
+          return this.searchQuery.toLowerCase().split(' ').every(v => item.plate.toLowerCase().includes(v))
+        })
+      }else{
+        return this.cars;
+      }
+    }
   },
   methods: {
     fetchCars(){
